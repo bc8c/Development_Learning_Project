@@ -216,27 +216,18 @@ ensure_pnpm_installed() {
     log_info "corepack을 활성화합니다"
     "${corepack_cmd[@]}" enable >/dev/null 2>&1 || true
     log_info "corepack으로 pnpm@${PNPM_VERSION} 활성화를 시도합니다"
-    local corepack_dir="${HOME}/.pnpm-corepack"
-    mkdir -p "${corepack_dir}"
-    if "${corepack_cmd[@]}" prepare "pnpm@${PNPM_VERSION}" --activate --install-directory "${corepack_dir}" >/dev/null 2>&1; then
+    if "${corepack_cmd[@]}" prepare "pnpm@${PNPM_VERSION}" --activate >/dev/null 2>&1; then
       local corepack_resolved
-      corepack_resolved="${corepack_dir}/bin/pnpm"
-      if [[ -x "${corepack_resolved}" ]]; then
+      corepack_resolved="$("${corepack_cmd[@]}" which pnpm 2>/dev/null || true)"
+      if [[ -n "${corepack_resolved}" && -x "${corepack_resolved}" ]]; then
         pnpm_ready=true
         resolved_pnpm="${corepack_resolved}"
-        log_info "corepack 패스 추가 전 PATH: $PATH"
-        export PATH="${corepack_dir}/bin:$PATH"
-        if [[ -n "${GITHUB_ENV:-}" ]]; then
-          echo "PATH=${corepack_dir}/bin:$PATH" >> "${GITHUB_ENV}"
-        fi
         log_info "corepack으로 pnpm ${PNPM_VERSION} 활성화 완료"
       else
-        log_warn "corepack 설치 경로(${corepack_resolved})에서 pnpm 실행 파일을 찾지 못했습니다."
+        log_warn "corepack 활성화는 되었으나 pnpm 실행 파일을 찾지 못했습니다."
       fi
     else
       log_warn "corepack 활성화에 실패했습니다."
-      log_warn "corepack 출력 디렉터리 내용:"
-      ls -al "${corepack_dir}" || true
       log_warn "corepack 문제로 npm fallback을 진행합니다"
     fi
   fi
@@ -262,14 +253,13 @@ ensure_pnpm_installed() {
     fi
 
     local pnpm_prefix="${HOME}/.npm/pnpm-global"
-    mkdir -p "${pnpm_prefix}"
+    mkdir -p "${pnpm_prefix}" "${pnpm_prefix}/bin"
     log_info "fallback 설치를 위해 npm prefix를 ${pnpm_prefix}로 설정합니다"
-    npm config set prefix "${pnpm_prefix}" >/dev/null 2>&1 || true
 
     log_info "npm을 통해 pnpm@${PNPM_VERSION} 전역 설치"
     npm uninstall -g pnpm >/dev/null 2>&1 || true
     log_info "npm install -g --force pnpm@${PNPM_VERSION} 실행"
-    if ! npm install -g --force "pnpm@${PNPM_VERSION}"; then
+    if ! env npm_config_prefix="${pnpm_prefix}" npm install -g --force "pnpm@${PNPM_VERSION}"; then
       log_error "npm install -g pnpm@${PNPM_VERSION} 실패"
       if [[ -d "${HOME}/.npm/_logs" ]]; then
         log_warn "npm 로그 출력"
@@ -287,9 +277,9 @@ ensure_pnpm_installed() {
     fi
 
     local npm_global_bin
-    npm_global_bin="$(npm bin -g)"
+    npm_global_bin="${pnpm_prefix}/bin"
     if [[ -n "${npm_global_bin}" ]]; then
-      log_info "npm bin -g 결과: ${npm_global_bin}"
+      log_info "npm 전역 bin 경로: ${npm_global_bin}"
       export PATH="${npm_global_bin}:$PATH"
       if [[ -n "${GITHUB_ENV:-}" ]]; then
         echo "PATH=${npm_global_bin}:$PATH" >> "${GITHUB_ENV}"
