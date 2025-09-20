@@ -218,8 +218,11 @@ ensure_pnpm_installed() {
     log_info "corepack으로 pnpm@${PNPM_VERSION} 활성화를 시도합니다"
     if "${corepack_cmd[@]}" prepare "pnpm@${PNPM_VERSION}" --activate >/dev/null 2>&1; then
       local corepack_resolved
-      corepack_resolved="$(command -v pnpm || true)"
-      if [[ -n "${corepack_resolved}" ]]; then
+      corepack_resolved="$("${corepack_cmd[@]}" which pnpm 2>/dev/null || true)"
+      if [[ -z "${corepack_resolved}" ]]; then
+        corepack_resolved="$(command -v pnpm || true)"
+      fi
+      if [[ -n "${corepack_resolved}" && -x "${corepack_resolved}" ]]; then
         pnpm_ready=true
         log_info "corepack으로 pnpm ${PNPM_VERSION} 활성화 완료"
         resolved_pnpm="${corepack_resolved}"
