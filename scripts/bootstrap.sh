@@ -234,7 +234,11 @@ ensure_pnpm_installed() {
         log_warn "corepack 설치 경로(${corepack_resolved})에서 pnpm 실행 파일을 찾지 못했습니다."
       fi
     else
-      log_warn "corepack 활성화에 실패했습니다. npm 전역 설치를 시도합니다."
+      log_warn "corepack 활성화에 실패했습니다."
+      "${corepack_cmd[@]}" prepare "pnpm@${PNPM_VERSION}" --activate --use-compress-program=cat || true
+      log_warn "corepack 출력 디렉터리 내용:" 
+      ls -al "${corepack_dir}" || true
+      log_warn "corepack 문제로 npm fallback을 진행합니다"
     fi
   fi
 
@@ -265,7 +269,15 @@ ensure_pnpm_installed() {
 
     log_info "npm을 통해 pnpm@${PNPM_VERSION} 전역 설치"
     npm uninstall -g pnpm >/dev/null 2>&1 || true
-    npm install -g --force "pnpm@${PNPM_VERSION}"
+    log_info "npm install -g --force pnpm@${PNPM_VERSION} 실행"
+    if ! npm install -g --force "pnpm@${PNPM_VERSION}"; then
+      log_error "npm install -g pnpm@${PNPM_VERSION} 실패"
+      if [[ -d "${HOME}/.npm/_logs" ]]; then
+        log_warn "npm 로그 출력"
+        find "${HOME}/.npm/_logs" -type f -name '*.log' -print -exec tail -n 40 {} \;
+      fi
+      exit 1
+    fi
 
     if [[ "${skip_reshim_for_ci}" == true ]]; then
       if [[ -n "${previous_skip_reshim}" ]]; then
