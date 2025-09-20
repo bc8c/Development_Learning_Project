@@ -199,7 +199,11 @@ ensure_pnpm_installed() {
   fi
 
   log_info "npm을 통해 pnpm@${PNPM_VERSION} 전역 설치"
-  npm install -g "pnpm@${PNPM_VERSION}"
+  if [[ -n "${CI:-}" || -n "${GITHUB_ACTIONS:-}" ]]; then
+    ASDF_SKIP_RESHIM=1 npm install -g "pnpm@${PNPM_VERSION}"
+  else
+    npm install -g "pnpm@${PNPM_VERSION}"
+  fi
 
   local npm_global_bin
   npm_global_bin="$(npm bin -g)"
