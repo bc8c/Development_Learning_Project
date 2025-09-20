@@ -231,6 +231,17 @@ ensure_pnpm_installed() {
 
   # 2) npm 전역 설치 (fallback)
   if [[ "${pnpm_ready}" != true ]]; then
+    log_info "fallback을 위해 기존 pnpm 링크를 다시 정리합니다"
+    rm -f "${npm_bin}/pnpm" "${npm_bin}/pnpx"
+    if command -v asdf >/dev/null 2>&1; then
+      rm -f "${HOME}/.asdf/shims/pnpm" "${HOME}/.asdf/shims/pnpx"
+      local asdf_node_bin_recheck="$(asdf where nodejs 2>/dev/null || true)"
+      if [[ -n "${asdf_node_bin_recheck}" ]]; then
+        asdf_node_bin_recheck="${asdf_node_bin_recheck}/bin"
+        rm -f "${asdf_node_bin_recheck}/pnpm" "${asdf_node_bin_recheck}/pnpx"
+      fi
+    fi
+
     local previous_skip_reshim="${ASDF_SKIP_RESHIM:-}"
     local skip_reshim_for_ci=false
     if [[ -n "${CI:-}" || -n "${GITHUB_ACTIONS:-}" ]]; then
@@ -238,8 +249,8 @@ ensure_pnpm_installed() {
       skip_reshim_for_ci=true
     fi
 
-  log_info "npm을 통해 pnpm@${PNPM_VERSION} 전역 설치"
-  npm install -g "pnpm@${PNPM_VERSION}"
+    log_info "npm을 통해 pnpm@${PNPM_VERSION} 전역 설치"
+    npm install -g --force "pnpm@${PNPM_VERSION}"
 
     if [[ "${skip_reshim_for_ci}" == true ]]; then
       if [[ -n "${previous_skip_reshim}" ]]; then
