@@ -248,9 +248,23 @@ ensure_pnpm_installed() {
     pnpm_ready=true
   fi
 
-  if [[ "${pnpm_ready}" != true ]]; then
+  local resolved_pnpm="$(command -v pnpm || true)"
+  if [[ -z "${resolved_pnpm}" && -n "${npm_global_bin:-}" && -x "${npm_global_bin}/pnpm" ]]; then
+    resolved_pnpm="${npm_global_bin}/pnpm"
+  fi
+
+  if [[ -z "${resolved_pnpm}" ]]; then
     log_error "pnpm 설치에 실패했습니다."
+    if [[ -n "${npm_global_bin:-}" ]]; then
+      log_warn "npm 글로벌 bin(${npm_global_bin}) 내용을 출력합니다"
+      ls -al "${npm_global_bin}" || true
+    fi
     exit 1
+  fi
+
+  export PNPM_BIN="${resolved_pnpm}"
+  if [[ -n "${GITHUB_ENV:-}" ]]; then
+    echo "PNPM_BIN=${PNPM_BIN}" >> "${GITHUB_ENV}"
   fi
 
   if command -v asdf >/dev/null 2>&1; then
@@ -262,7 +276,7 @@ ensure_pnpm_installed() {
     fi
   fi
 
-  log_success "pnpm $(pnpm --version) 설치 완료"
+  log_success "pnpm $(${PNPM_BIN} --version) 설치 완료"
 }
 
 ensure_pre_commit_ready() {
