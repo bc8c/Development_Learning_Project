@@ -206,6 +206,8 @@ ensure_pnpm_installed() {
     if command -v asdf >/dev/null 2>&1; then
       corepack_cmd=(asdf exec corepack)
     fi
+    log_info "corepack을 활성화합니다"
+    "${corepack_cmd[@]}" enable >/dev/null 2>&1 || true
     log_info "corepack으로 pnpm@${PNPM_VERSION} 활성화를 시도합니다"
     if "${corepack_cmd[@]}" prepare "pnpm@${PNPM_VERSION}" --activate >/dev/null 2>&1; then
       pnpm_ready=true

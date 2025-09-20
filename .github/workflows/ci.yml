@@ -33,8 +33,7 @@ jobs:
             libsqlite3-dev \
             zlib1g-dev \
             tk-dev \
-            uuid-dev \
-            corepack
+            uuid-dev
 
       - name: Bootstrap environment
         run: |
