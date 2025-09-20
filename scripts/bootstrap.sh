@@ -212,11 +212,11 @@ ensure_pnpm_installed() {
   fi
 
   if command -v asdf >/dev/null 2>&1; then
-    if [[ -z "${CI:-}" ]]; then
+    if [[ -n "${CI:-}" || -n "${GITHUB_ACTIONS:-}" ]]; then
+      log_info "CI 환경에서는 asdf reshim 단계를 건너뜁니다"
+    else
       log_info "asdf shim을 갱신합니다"
       asdf reshim nodejs >/dev/null 2>&1 || true
-    else
-      log_info "CI 환경에서는 asdf reshim 단계를 건너뜁니다"
     fi
   fi
 
