@@ -193,6 +193,11 @@ ensure_pnpm_installed() {
   log_info "기존 pnpm 링크를 정리합니다 (${npm_bin}/pnpm, ${npm_bin}/pnpx)"
   rm -f "${npm_bin}/pnpm" "${npm_bin}/pnpx"
 
+  if command -v asdf >/dev/null 2>&1; then
+    log_info "기존 asdf pnpm 쉼을 정리합니다"
+    rm -f "${HOME}/.asdf/shims/pnpm" "${HOME}/.asdf/shims/pnpx"
+  fi
+
   log_info "npm을 통해 pnpm@${PNPM_VERSION} 전역 설치"
   npm install -g "pnpm@${PNPM_VERSION}"
 
