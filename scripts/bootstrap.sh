@@ -212,8 +212,12 @@ ensure_pnpm_installed() {
   fi
 
   if command -v asdf >/dev/null 2>&1; then
-    log_info "asdf shim을 갱신합니다"
-    asdf reshim nodejs >/dev/null 2>&1 || true
+    if [[ -z "${CI:-}" ]]; then
+      log_info "asdf shim을 갱신합니다"
+      asdf reshim nodejs >/dev/null 2>&1 || true
+    else
+      log_info "CI 환경에서는 asdf reshim 단계를 건너뜁니다"
+    fi
   fi
 
   log_success "pnpm $(pnpm --version) 설치 완료"
