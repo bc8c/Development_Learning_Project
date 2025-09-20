@@ -50,7 +50,7 @@ repos:
     hooks:
       - id: update-learning-index
         name: Update learning index dates
-        entry: scripts/update_learning_index_dates.py
+        entry: scripts/pre-commit/hooks/update_learning_index_dates.py
         language: system
         types: [markdown]
         pass_filenames: false

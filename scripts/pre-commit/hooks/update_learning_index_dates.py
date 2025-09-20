@@ -9,7 +9,7 @@ import re
 from pathlib import Path
 from typing import Iterable
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
+REPO_ROOT = Path(__file__).resolve().parents[3]
 LEARNING_ROOT = REPO_ROOT / "docs" / "learning_notes"
 INDEX_FILENAME = "index.md"
 DATE_PATTERN = re.compile(r"(-\s*최신\s*업데이트:\s*)(\d{4}-\d{2}-\d{2})")
