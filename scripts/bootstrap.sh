@@ -196,6 +196,12 @@ ensure_pnpm_installed() {
   if command -v asdf >/dev/null 2>&1; then
     log_info "기존 asdf pnpm 쉼을 정리합니다"
     rm -f "${HOME}/.asdf/shims/pnpm" "${HOME}/.asdf/shims/pnpx"
+    local asdf_node_bin="$(asdf where nodejs 2>/dev/null || true)"
+    if [[ -n "${asdf_node_bin}" ]]; then
+      asdf_node_bin="${asdf_node_bin}/bin"
+      log_info "asdf nodejs bin (${asdf_node_bin}) 경로의 pnpm, pnpx를 정리합니다"
+      rm -f "${asdf_node_bin}/pnpm" "${asdf_node_bin}/pnpx"
+    fi
   fi
 
   local pnpm_ready=false
@@ -232,8 +238,8 @@ ensure_pnpm_installed() {
       skip_reshim_for_ci=true
     fi
 
-    log_info "npm을 통해 pnpm@${PNPM_VERSION} 전역 설치"
-    npm install -g "pnpm@${PNPM_VERSION}"
+  log_info "npm을 통해 pnpm@${PNPM_VERSION} 전역 설치"
+  npm install -g "pnpm@${PNPM_VERSION}"
 
     if [[ "${skip_reshim_for_ci}" == true ]]; then
       if [[ -n "${previous_skip_reshim}" ]]; then
