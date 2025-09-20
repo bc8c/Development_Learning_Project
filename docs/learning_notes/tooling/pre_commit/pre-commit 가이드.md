@@ -65,7 +65,3 @@ repos:
 - [pre-commit 공식 문서](https://pre-commit.com/)
 - [Hooks and configuration](https://pre-commit.com/#hooks)
 - [Conventional Commit 소개](https://www.conventionalcommits.org/)
-
-## Related Topics
-- [tooling 학습 노트 인덱스](../index.md)
-- [GitHub Actions 개요](../../ci_cd/github_actions/GitHub%20Actions%20개요.md)
