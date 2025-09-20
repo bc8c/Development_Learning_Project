@@ -205,6 +205,7 @@ ensure_pnpm_installed() {
   fi
 
   local pnpm_ready=false
+  local resolved_pnpm=""
 
   # 1) corepack을 통한 활성화 시도
   if command -v corepack >/dev/null 2>&1; then
@@ -221,6 +222,7 @@ ensure_pnpm_installed() {
       if [[ -n "${corepack_resolved}" ]]; then
         pnpm_ready=true
         log_info "corepack으로 pnpm ${PNPM_VERSION} 활성화 완료"
+        resolved_pnpm="${corepack_resolved}"
       else
         log_warn "corepack 활성화는 완료되었지만 pnpm 실행 파일을 찾지 못했습니다."
       fi
@@ -268,12 +270,18 @@ ensure_pnpm_installed() {
         echo "PATH=${npm_global_bin}:$PATH" >> "${GITHUB_ENV}"
       fi
       log_info "npm 글로벌 bin 경로(${npm_global_bin})를 PATH에 추가했습니다."
+      if [[ -x "${npm_global_bin}/pnpm" ]]; then
+        resolved_pnpm="${npm_global_bin}/pnpm"
+      fi
     fi
 
     pnpm_ready=true
+    hash -r 2>/dev/null || true
   fi
 
-  local resolved_pnpm="$(command -v pnpm || true)"
+  if [[ -z "${resolved_pnpm}" ]]; then
+    resolved_pnpm="$(command -v pnpm || true)"
+  fi
   if [[ -z "${resolved_pnpm}" && -n "${npm_global_bin:-}" && -x "${npm_global_bin}/pnpm" ]]; then
     resolved_pnpm="${npm_global_bin}/pnpm"
   fi
