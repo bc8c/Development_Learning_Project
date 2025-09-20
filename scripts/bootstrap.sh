@@ -216,18 +216,21 @@ ensure_pnpm_installed() {
     log_info "corepack을 활성화합니다"
     "${corepack_cmd[@]}" enable >/dev/null 2>&1 || true
     log_info "corepack으로 pnpm@${PNPM_VERSION} 활성화를 시도합니다"
-    if "${corepack_cmd[@]}" prepare "pnpm@${PNPM_VERSION}" --activate >/dev/null 2>&1; then
+    local corepack_dir="${HOME}/.pnpm-corepack"
+    mkdir -p "${corepack_dir}"
+    if "${corepack_cmd[@]}" prepare "pnpm@${PNPM_VERSION}" --activate --install-directory "${corepack_dir}" >/dev/null 2>&1; then
       local corepack_resolved
-      corepack_resolved="$("${corepack_cmd[@]}" which pnpm 2>/dev/null || true)"
-      if [[ -z "${corepack_resolved}" ]]; then
-        corepack_resolved="$(command -v pnpm || true)"
-      fi
-      if [[ -n "${corepack_resolved}" && -x "${corepack_resolved}" ]]; then
+      corepack_resolved="${corepack_dir}/bin/pnpm"
+      if [[ -x "${corepack_resolved}" ]]; then
         pnpm_ready=true
-        log_info "corepack으로 pnpm ${PNPM_VERSION} 활성화 완료"
         resolved_pnpm="${corepack_resolved}"
+        export PATH="${corepack_dir}/bin:$PATH"
+        if [[ -n "${GITHUB_ENV:-}" ]]; then
+          echo "PATH=${corepack_dir}/bin:$PATH" >> "${GITHUB_ENV}"
+        fi
+        log_info "corepack으로 pnpm ${PNPM_VERSION} 활성화 완료"
       else
-        log_warn "corepack 활성화는 완료되었지만 pnpm 실행 파일을 찾지 못했습니다."
+        log_warn "corepack 설치 경로(${corepack_resolved})에서 pnpm 실행 파일을 찾지 못했습니다."
       fi
     else
       log_warn "corepack 활성화에 실패했습니다. npm 전역 설치를 시도합니다."
@@ -255,6 +258,7 @@ ensure_pnpm_installed() {
     fi
 
     log_info "npm을 통해 pnpm@${PNPM_VERSION} 전역 설치"
+    npm uninstall -g pnpm >/dev/null 2>&1 || true
     npm install -g --force "pnpm@${PNPM_VERSION}"
 
     if [[ "${skip_reshim_for_ci}" == true ]]; then
