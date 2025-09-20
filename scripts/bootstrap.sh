@@ -257,6 +257,11 @@ ensure_pnpm_installed() {
       skip_reshim_for_ci=true
     fi
 
+    local pnpm_prefix="${HOME}/.npm/pnpm-global"
+    mkdir -p "${pnpm_prefix}"
+    log_info "fallback 설치를 위해 npm prefix를 ${pnpm_prefix}로 설정합니다"
+    npm config set prefix "${pnpm_prefix}" >/dev/null 2>&1 || true
+
     log_info "npm을 통해 pnpm@${PNPM_VERSION} 전역 설치"
     npm uninstall -g pnpm >/dev/null 2>&1 || true
     npm install -g --force "pnpm@${PNPM_VERSION}"
