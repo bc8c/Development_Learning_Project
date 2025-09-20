@@ -2,6 +2,7 @@
 
 ## IMPORTANTS
 - Always answer in Korean
+- 모든 git 관련 명령은 사용자의 명시적 확인 후에만 실행할 것
 
 ## Project Structure & Module Organization
 - Keep production code in `src/` with domain-focused packages (for example `src/agents/dispatcher.py`).
