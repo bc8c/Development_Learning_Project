@@ -198,11 +198,22 @@ ensure_pnpm_installed() {
     rm -f "${HOME}/.asdf/shims/pnpm" "${HOME}/.asdf/shims/pnpx"
   fi
 
-  log_info "npm을 통해 pnpm@${PNPM_VERSION} 전역 설치"
+  local previous_skip_reshim="${ASDF_SKIP_RESHIM:-}"
+  local skip_reshim_for_ci=false
   if [[ -n "${CI:-}" || -n "${GITHUB_ACTIONS:-}" ]]; then
-    ASDF_SKIP_RESHIM=1 npm install -g "pnpm@${PNPM_VERSION}"
-  else
-    npm install -g "pnpm@${PNPM_VERSION}"
+    export ASDF_SKIP_RESHIM=1
+    skip_reshim_for_ci=true
+  fi
+
+  log_info "npm을 통해 pnpm@${PNPM_VERSION} 전역 설치"
+  npm install -g "pnpm@${PNPM_VERSION}"
+
+  if [[ "${skip_reshim_for_ci}" == true ]]; then
+    if [[ -n "${previous_skip_reshim}" ]]; then
+      export ASDF_SKIP_RESHIM="${previous_skip_reshim}"
+    else
+      unset ASDF_SKIP_RESHIM
+    fi
   fi
 
   local npm_global_bin
