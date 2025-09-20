@@ -198,32 +198,59 @@ ensure_pnpm_installed() {
     rm -f "${HOME}/.asdf/shims/pnpm" "${HOME}/.asdf/shims/pnpx"
   fi
 
-  local previous_skip_reshim="${ASDF_SKIP_RESHIM:-}"
-  local skip_reshim_for_ci=false
-  if [[ -n "${CI:-}" || -n "${GITHUB_ACTIONS:-}" ]]; then
-    export ASDF_SKIP_RESHIM=1
-    skip_reshim_for_ci=true
-  fi
+  local pnpm_ready=false
 
-  log_info "npm을 통해 pnpm@${PNPM_VERSION} 전역 설치"
-  npm install -g "pnpm@${PNPM_VERSION}"
-
-  if [[ "${skip_reshim_for_ci}" == true ]]; then
-    if [[ -n "${previous_skip_reshim}" ]]; then
-      export ASDF_SKIP_RESHIM="${previous_skip_reshim}"
+  # 1) corepack을 통한 활성화 시도
+  if command -v corepack >/dev/null 2>&1; then
+    local corepack_cmd=(corepack)
+    if command -v asdf >/dev/null 2>&1; then
+      corepack_cmd=(asdf exec corepack)
+    fi
+    log_info "corepack으로 pnpm@${PNPM_VERSION} 활성화를 시도합니다"
+    if "${corepack_cmd[@]}" prepare "pnpm@${PNPM_VERSION}" --activate >/dev/null 2>&1; then
+      pnpm_ready=true
+      log_info "corepack으로 pnpm ${PNPM_VERSION} 활성화 완료"
     else
-      unset ASDF_SKIP_RESHIM
+      log_warn "corepack 활성화에 실패했습니다. npm 전역 설치를 시도합니다."
     fi
   fi
 
-  local npm_global_bin
-  npm_global_bin="$(npm bin -g)"
-  if [[ -n "${npm_global_bin}" ]]; then
-    export PATH="${npm_global_bin}:$PATH"
-    if [[ -n "${GITHUB_ENV:-}" ]]; then
-      echo "PATH=${npm_global_bin}:$PATH" >> "${GITHUB_ENV}"
+  # 2) npm 전역 설치 (fallback)
+  if [[ "${pnpm_ready}" != true ]]; then
+    local previous_skip_reshim="${ASDF_SKIP_RESHIM:-}"
+    local skip_reshim_for_ci=false
+    if [[ -n "${CI:-}" || -n "${GITHUB_ACTIONS:-}" ]]; then
+      export ASDF_SKIP_RESHIM=1
+      skip_reshim_for_ci=true
     fi
-    log_info "npm 글로벌 bin 경로(${npm_global_bin})를 PATH에 추가했습니다."
+
+    log_info "npm을 통해 pnpm@${PNPM_VERSION} 전역 설치"
+    npm install -g "pnpm@${PNPM_VERSION}"
+
+    if [[ "${skip_reshim_for_ci}" == true ]]; then
+      if [[ -n "${previous_skip_reshim}" ]]; then
+        export ASDF_SKIP_RESHIM="${previous_skip_reshim}"
+      else
+        unset ASDF_SKIP_RESHIM
+      fi
+    fi
+
+    local npm_global_bin
+    npm_global_bin="$(npm bin -g)"
+    if [[ -n "${npm_global_bin}" ]]; then
+      export PATH="${npm_global_bin}:$PATH"
+      if [[ -n "${GITHUB_ENV:-}" ]]; then
+        echo "PATH=${npm_global_bin}:$PATH" >> "${GITHUB_ENV}"
+      fi
+      log_info "npm 글로벌 bin 경로(${npm_global_bin})를 PATH에 추가했습니다."
+    fi
+
+    pnpm_ready=true
+  fi
+
+  if [[ "${pnpm_ready}" != true ]]; then
+    log_error "pnpm 설치에 실패했습니다."
+    exit 1
   fi
 
   if command -v asdf >/dev/null 2>&1; then
