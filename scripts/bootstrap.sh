@@ -224,6 +224,7 @@ ensure_pnpm_installed() {
       if [[ -x "${corepack_resolved}" ]]; then
         pnpm_ready=true
         resolved_pnpm="${corepack_resolved}"
+        log_info "corepack 패스 추가 전 PATH: $PATH"
         export PATH="${corepack_dir}/bin:$PATH"
         if [[ -n "${GITHUB_ENV:-}" ]]; then
           echo "PATH=${corepack_dir}/bin:$PATH" >> "${GITHUB_ENV}"
@@ -277,6 +278,7 @@ ensure_pnpm_installed() {
     local npm_global_bin
     npm_global_bin="$(npm bin -g)"
     if [[ -n "${npm_global_bin}" ]]; then
+      log_info "npm bin -g 결과: ${npm_global_bin}"
       export PATH="${npm_global_bin}:$PATH"
       if [[ -n "${GITHUB_ENV:-}" ]]; then
         echo "PATH=${npm_global_bin}:$PATH" >> "${GITHUB_ENV}"
@@ -315,6 +317,7 @@ ensure_pnpm_installed() {
 
   local pnpm_dir
   pnpm_dir="$(dirname "${resolved_pnpm}")"
+  log_info "pnpm 실행 파일 경로: ${resolved_pnpm}"
   export PATH="${pnpm_dir}:$PATH"
   if [[ -n "${GITHUB_ENV:-}" ]]; then
     echo "PATH=${pnpm_dir}:$PATH" >> "${GITHUB_ENV}"
