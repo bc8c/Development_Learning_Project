@@ -235,8 +235,7 @@ ensure_pnpm_installed() {
       fi
     else
       log_warn "corepack 활성화에 실패했습니다."
-      "${corepack_cmd[@]}" prepare "pnpm@${PNPM_VERSION}" --activate --use-compress-program=cat || true
-      log_warn "corepack 출력 디렉터리 내용:" 
+      log_warn "corepack 출력 디렉터리 내용:"
       ls -al "${corepack_dir}" || true
       log_warn "corepack 문제로 npm fallback을 진행합니다"
     fi
