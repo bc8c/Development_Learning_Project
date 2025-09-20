@@ -196,6 +196,16 @@ ensure_pnpm_installed() {
   log_info "npm을 통해 pnpm@${PNPM_VERSION} 전역 설치"
   npm install -g "pnpm@${PNPM_VERSION}"
 
+  local npm_global_bin
+  npm_global_bin="$(npm bin -g)"
+  if [[ -n "${npm_global_bin}" ]]; then
+    export PATH="${npm_global_bin}:$PATH"
+    if [[ -n "${GITHUB_ENV:-}" ]]; then
+      echo "PATH=${npm_global_bin}:$PATH" >> "${GITHUB_ENV}"
+    fi
+    log_info "npm 글로벌 bin 경로(${npm_global_bin})를 PATH에 추가했습니다."
+  fi
+
   if command -v asdf >/dev/null 2>&1; then
     log_info "asdf shim을 갱신합니다"
     asdf reshim nodejs >/dev/null 2>&1 || true
