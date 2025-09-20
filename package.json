@@ -1,0 +1,11 @@
+{
+  "name": "codex-prj",
+  "private": true,
+  "packageManager": "pnpm@9.12.1",
+  "scripts": {
+    "setup": "pnpm install",
+    "dev": "echo \"TODO: frontend dev server command (e.g., pnpm --filter frontend dev)\"",
+    "lint": "echo \"TODO: lint command (e.g., pnpm --filter frontend lint)\"",
+    "test": "echo \"TODO: test command (e.g., pnpm --filter frontend test)\""
+  }
+}

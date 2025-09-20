@@ -1,0 +1,11 @@
+{
+  "name": "@codex/backend",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Backend service (Spring Boot placeholder).",
+  "scripts": {
+    "dev": "echo \"TODO: run Spring Boot dev server\"",
+    "build": "echo \"TODO: build backend (Gradle/Maven)\"",
+    "test": "echo \"TODO: backend tests\""
+  }
+}

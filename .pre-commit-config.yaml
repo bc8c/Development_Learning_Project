@@ -1,0 +1,9 @@
+repos:
+  - repo: local
+    hooks:
+      - id: update-learning-index
+        name: Update learning index dates
+        entry: scripts/update_learning_index_dates.py
+        language: system
+        types: [markdown]
+        pass_filenames: false

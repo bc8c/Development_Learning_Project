@@ -1,0 +1,29 @@
+# Runtime environments
+/.venv/
+/.pre-commit-cache/
+/.ruff_cache/
+/.mypy_cache/
+/.pytest_cache/
+__pycache__/
+*.py[cod]
+
+# Node/PNPM artifacts
+node_modules/
+pnpm-debug.log*
+
+# Build & distribution outputs
+dist/
+build/
+.coverage
+coverage.xml
+htmlcov/
+
+# IDE/Editor settings
+.idea/
+.vscode/
+*.code-workspace
+
+# macOS/Linux noise
+.DS_Store
+Thumbs.db
+*.swp

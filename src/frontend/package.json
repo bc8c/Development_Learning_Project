@@ -1,0 +1,12 @@
+{
+  "name": "@codex/frontend",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Frontend application (Next.js placeholder).",
+  "scripts": {
+    "dev": "echo \"TODO: Next.js dev server\"",
+    "build": "echo \"TODO: Next.js build\"",
+    "lint": "echo \"TODO: frontend lint\"",
+    "test": "echo \"TODO: frontend tests\""
+  }
+}

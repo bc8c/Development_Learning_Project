@@ -1,0 +1,4 @@
+packages:
+  - src/backend
+  - src/frontend
+  - scripts
