@@ -210,8 +210,14 @@ ensure_pnpm_installed() {
     "${corepack_cmd[@]}" enable >/dev/null 2>&1 || true
     log_info "corepack으로 pnpm@${PNPM_VERSION} 활성화를 시도합니다"
     if "${corepack_cmd[@]}" prepare "pnpm@${PNPM_VERSION}" --activate >/dev/null 2>&1; then
-      pnpm_ready=true
-      log_info "corepack으로 pnpm ${PNPM_VERSION} 활성화 완료"
+      local corepack_resolved
+      corepack_resolved="$(command -v pnpm || true)"
+      if [[ -n "${corepack_resolved}" ]]; then
+        pnpm_ready=true
+        log_info "corepack으로 pnpm ${PNPM_VERSION} 활성화 완료"
+      else
+        log_warn "corepack 활성화는 완료되었지만 pnpm 실행 파일을 찾지 못했습니다."
+      fi
     else
       log_warn "corepack 활성화에 실패했습니다. npm 전역 설치를 시도합니다."
     fi
