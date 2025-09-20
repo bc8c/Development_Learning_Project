@@ -292,6 +292,12 @@ ensure_pnpm_installed() {
   if [[ -z "${resolved_pnpm}" && -n "${npm_global_bin:-}" && -x "${npm_global_bin}/pnpm" ]]; then
     resolved_pnpm="${npm_global_bin}/pnpm"
   fi
+  if [[ -z "${resolved_pnpm}" && -x "${HOME}/.npm/pnpm-global/bin/pnpm" ]]; then
+    resolved_pnpm="${HOME}/.npm/pnpm-global/bin/pnpm"
+  fi
+  if [[ -z "${resolved_pnpm}" && -x "${HOME}/.pnpm-corepack/bin/pnpm" ]]; then
+    resolved_pnpm="${HOME}/.pnpm-corepack/bin/pnpm"
+  fi
 
   if [[ -z "${resolved_pnpm}" ]]; then
     log_error "pnpm 설치에 실패했습니다."
