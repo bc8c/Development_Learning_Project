@@ -262,6 +262,14 @@ ensure_pnpm_installed() {
     exit 1
   fi
 
+  local pnpm_dir
+  pnpm_dir="$(dirname "${resolved_pnpm}")"
+  export PATH="${pnpm_dir}:$PATH"
+  if [[ -n "${GITHUB_ENV:-}" ]]; then
+    echo "PATH=${pnpm_dir}:$PATH" >> "${GITHUB_ENV}"
+  fi
+  log_info "pnpm 실행 파일: ${resolved_pnpm}"
+
   export PNPM_BIN="${resolved_pnpm}"
   if [[ -n "${GITHUB_ENV:-}" ]]; then
     echo "PNPM_BIN=${PNPM_BIN}" >> "${GITHUB_ENV}"

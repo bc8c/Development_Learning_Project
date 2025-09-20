@@ -21,7 +21,19 @@ jobs:
       - name: Install system dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y curl git
+          sudo apt-get install -y \
+            curl \
+            git \
+            build-essential \
+            libbz2-dev \
+            libreadline-dev \
+            liblzma-dev \
+            libffi-dev \
+            libssl-dev \
+            libsqlite3-dev \
+            zlib1g-dev \
+            tk-dev \
+            uuid-dev
 
       - name: Bootstrap environment
         run: |
